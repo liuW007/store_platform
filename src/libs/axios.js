@@ -1,7 +1,16 @@
 import Axios from 'axios'
 import Qs from 'qs'
 import iView from 'iview'
+import config from '@/config';
 
+const {
+    mockConfig: {
+      useMock,
+      devMock
+    },
+    toLogin
+  } = config;
+  
 /**
  * @description ajax类
  * @description 基于axios开发
@@ -17,6 +26,8 @@ class HttpRequest{
      * @description axios默认配置
      */
     setDefaultConfig () {
+        // 判断是否启用了Mock数据
+        const baseURL = useMock ? devMock : this.baseUrl;
         const default_config = {
             // `url`是请求的接口地址
             url: '',
@@ -30,7 +41,7 @@ class HttpRequest{
             },
 
             // 如果url不是绝对路径，那么会将baseURL和url拼接作为请求的接口地址
-            baseURL: this.baseUrl,
+            baseURL,
 
             // `maxRedirects`是最大重定向的个数
             maxRedirects: 5, // default
@@ -102,16 +113,29 @@ class HttpRequest{
                 status
             } = res;
             console.log('接口' + options.url + '返回成功=>', data);
+            // Get方式请求路由，刷新缓存数据
+            if (config && new RegExp(/js\/menu/).test(config.url)) {
+              return res.data;
+            }
+      
             // 判断返回的code等于0表示正确返回数据，否则为异常返回
-            if (Number.parseInt(data.code) == 0) {
-                return data.data;
+            let return_code = Number.parseInt(data.code);
+            if (return_code === 0) {
+              // 正常返回
+              return data.data;
             } else {
-                iView.Message.info(data.msg);
-                return Promise.reject({
-                    code_err: true,         //如果code_err存在，可用此字段判断是否是code错误
-                    data,
-                    status
-                });
+              if(return_code === 2001 && window.location.href.indexOf('#/login') < 0) {
+                // 登录失败2001，如果当前页不是登录页面，则跳转回登录页
+                toLogin();
+                return;
+              }
+              // 其他失败，弹出消息提示框
+              iView.Message.error(data.msg);
+              return Promise.reject({
+                code_err: true,       //如果code_err存在，可用此字段判断是否是code错误
+                data,
+                status
+              });
             }
         }, error => {
             // 隐藏loading

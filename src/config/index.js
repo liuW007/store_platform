@@ -1,3 +1,5 @@
+import iView from 'iview'
+
 export default {
     /**
      * @description 配置显示在浏览器标签的title
@@ -25,6 +27,26 @@ export default {
     mockConfig: {
         useMock: false,
         devMock: ''
+    },
+    
+    /**
+     * @description 回到登录页
+     * @description 获取当前url并做相对路径处理
+     */
+    toLogin () {
+        iView.Message.error({
+        content: '未登录,3秒后将回到登录页',
+        duration: 3,
+        onClose: () => {
+            window.location.href =  window.location.pathname + '#/login';
+        }
+        });
+    },
+
+    // 回到首页
+    toHome () {
+        let now = (new Date()).getTime();
+        window.location.href = window.location.pathname + '?v='+ now +'#/home';
     },
 
     /**

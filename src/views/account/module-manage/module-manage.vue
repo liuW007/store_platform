@@ -1,6 +1,6 @@
 <template>
 <div class="module-manage">
-
+ModuleManage
 </div>
 </template>
 
