@@ -24,7 +24,7 @@ export default [
     {
         path: '/',
         name: '_home',
-        redirect: '_home',
+        redirect: 'home',
         component: Home,
         children: [
             {

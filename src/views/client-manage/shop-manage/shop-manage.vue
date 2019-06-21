@@ -1,6 +1,6 @@
 <template>
 <div class="shop-manage">
-  ShopManage
+  <Table :columns="columns" :data="datas"></Table>
 </div>
 </template>
 
@@ -15,7 +15,18 @@ export default {
           keyword: '',
           areaid: 0,
           page: 1,
-        }
+        },
+        columns: [
+          {
+            title: '名字',
+            key: 'name'
+          },
+          {
+            title: '类别',
+            key: 'remark'
+          }
+        ],
+        datas: [],
       }
     },
     methods: {
@@ -23,6 +34,7 @@ export default {
       query () {
         api.company.query().then(res=>{
           console.log(res);
+          this.datas = res;
         }).catch(err=>{})
       },
     },
